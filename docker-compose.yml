@@ -1,0 +1,40 @@
+version: "3.4"
+services:
+  db:
+    image: postgres:12.2
+    ports:
+      - "${DOCKER_HOST_DATABASE_PORT:-127.0.0.1:15432}:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: "${DATABASE_NAME:-my_app}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./docker/data/postgres_dev:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        DOCKER_HOST_USER_NAME: "${DOCKER_HOST_USER_NAME}"
+    image: me-dev
+    depends_on:
+      - "db"
+    entrypoint: ["/home/${DOCKER_HOST_USER_NAME}/app/docker/entrypoint.sh"]
+    user: "${DOCKER_HOST_USER_NAME}"
+    env_file: .env
+    ports:
+      - "${DOCKER_HOST_PORT:-4000}:${PORT:-4000}"
+    user: "${DOCKER_HOST_USER_NAME}"
+    volumes:
+      - "./lib:/home/${DOCKER_HOST_USER_NAME}/app/lib"
+      - "./config:/home/${DOCKER_HOST_USER_NAME}/app/config"
+      - "./deps:/deps/${DOCKER_HOST_USER_NAME}/app/deps"
+      - "./mix.exs:/deps/${DOCKER_HOST_USER_NAME}/app/mix.exs"
+      - "./mix.lock:/deps/${DOCKER_HOST_USER_NAME}/app/mix.lock"

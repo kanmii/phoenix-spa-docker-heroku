@@ -1,0 +1,50 @@
+FROM elixir:1.9.4-slim AS dev
+
+# user should supply when building
+ARG DOCKER_HOST_USER_NAME
+ARG PORT
+ARG MIX_ENV=dev
+
+ARG APP_DEPS="openssl git"
+ARG HOME_VAR=/home/${DOCKER_HOST_USER_NAME}
+ARG APP_PATH=${HOME_VAR}/app
+
+ENV MIX_ENV=${MIX_ENV}
+
+ENV DATABASE_HOST=db
+
+RUN apt-get update \
+  && apt-get install -y ${APP_DEPS} --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /usr/share/doc && rm -rf /usr/share/man \
+  && apt-get clean
+
+RUN groupadd ${DOCKER_HOST_USER_NAME} && \
+  useradd -m -g ${DOCKER_HOST_USER_NAME} \
+  ${DOCKER_HOST_USER_NAME}
+
+USER ${DOCKER_HOST_USER_NAME}
+
+RUN mix local.hex --force \
+  && mix local.rebar --force
+
+USER root
+
+WORKDIR ${APP_PATH}
+
+COPY mix.exs mix.lock ./
+COPY config config
+COPY . .
+
+RUN chown -R ${DOCKER_HOST_USER_NAME}:${DOCKER_HOST_USER_NAME} \
+  ${HOME_VAR}
+
+USER ${DOCKER_HOST_USER_NAME}
+
+RUN GIT_SSL_NO_VERIFY=1 mix do deps.get, compile
+
+EXPOSE ${PORT}
+
+RUN chmod +x ./docker/entrypoint.sh
+
+CMD ["/bin/bash"]

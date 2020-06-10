@@ -1,13 +1,6 @@
 import Config
 
-# Configure your database
-config :me, Me.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "me_dev",
-  hostname: "localhost",
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -16,7 +9,6 @@ config :me, Me.Repo,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :me, MeWeb.Endpoint,
-  http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

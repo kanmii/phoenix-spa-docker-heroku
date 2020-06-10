@@ -7,12 +7,27 @@
 # General application configuration
 import Config
 
+database_url = System.get_env("DATABASE_URL")
+
+port =
+  System.get_env("PORT", "4000")
+  |> String.to_integer()
+
+host = System.get_env("HOST", "localhost")
+
 config :me,
   ecto_repos: [Me.Repo]
 
+# Configure your database
+config :me, Me.Repo,
+  url: database_url,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # Configures the endpoint
 config :me, MeWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: host],
+  http: [port: port],
   secret_key_base: "4aTUwjX2u1fUoEAC/6p/ESROwg6zrud2JvtJ86hu5yVpB+fTXlC6wAESl6QwVoSW",
   render_errors: [view: MeWeb.ErrorView, accepts: ~w(json), layout: false],
   pubsub_server: Me.PubSub,
