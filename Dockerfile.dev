@@ -2,9 +2,9 @@ FROM elixir:1.9.4-slim AS dev
 
 ARG DOCKER_HOST_USER_NAME
 
-ARG APP_DEPS="openssl git"
+ARG APP_DEPS="openssl"
 ARG HOME_VAR=/home/${DOCKER_HOST_USER_NAME}
-ARG APP_PATH=${HOME_VAR}/app
+ARG APP_PATH=${HOME_VAR}/src
 
 RUN apt-get update \
   && apt-get install -y ${APP_DEPS} --no-install-recommends \
@@ -16,8 +16,8 @@ RUN groupadd ${DOCKER_HOST_USER_NAME} && \
   useradd -m -g ${DOCKER_HOST_USER_NAME} \
   ${DOCKER_HOST_USER_NAME}
 
+# hex has to be installed as the user that will compile and run our app
 USER ${DOCKER_HOST_USER_NAME}
-
 RUN mix local.hex --force \
   && mix local.rebar --force
 
@@ -31,12 +31,13 @@ WORKDIR ${APP_PATH}
 COPY mix.exs mix.lock ./
 COPY config config
 COPY . .
-RUN rm -rf docker
 
 RUN chown -R \
   ${DOCKER_HOST_USER_NAME}:${DOCKER_HOST_USER_NAME} \
-  ${HOME_VAR}
+  ${HOME_VAR} \
+  && rm -rf docker
 
+# run app as non root user to avoid volume mount problems
 USER ${DOCKER_HOST_USER_NAME}
 
 RUN mix do deps.get, deps.compile
