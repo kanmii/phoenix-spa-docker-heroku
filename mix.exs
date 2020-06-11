@@ -10,7 +10,15 @@ defmodule Me.MixProject do
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [
+        me: [
+          include_executables_for: [:unix],
+          applications: [
+            me: :permanent
+          ]
+        ]
+      ]
     ]
   end
 
@@ -20,7 +28,10 @@ defmodule Me.MixProject do
   def application do
     [
       mod: {Me.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [
+        :logger,
+        :runtime_tools
+      ]
     ]
   end
 

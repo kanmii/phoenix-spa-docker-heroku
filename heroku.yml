@@ -5,11 +5,6 @@ setup:
 build:
   docker:
     web: Dockerfile
-  config:
-    PORT: 443
-    HOST: darnish.herokuapp.com
-    CHECK_ORIGINS: "[\"//localhost\"]"
-    DATABASE_SSL: true
 release:
   image: web
   command:
