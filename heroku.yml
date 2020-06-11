@@ -7,7 +7,5 @@ build:
     web: Dockerfile
 release:
   image: web
-  command:
-    - POOL_SIZE=2 mix ecto.migrate
 run:
   web: /usr/local/bin/entrypoint.sh
