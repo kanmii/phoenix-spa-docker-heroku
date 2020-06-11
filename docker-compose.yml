@@ -15,9 +15,9 @@ services:
       retries: 5
       start_period: 10s
     volumes:
-      - ./docker/data/postgres_dev:/var/lib/postgresql/data
+      - "./docker/data/postgres-${MIX_ENV:-dev}:/var/lib/postgresql/data"
 
-  web:
+  api:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -26,15 +26,16 @@ services:
     image: me-dev
     depends_on:
       - "db"
-    entrypoint: ["/home/${DOCKER_HOST_USER_NAME}/app/docker/entrypoint.sh"]
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
     user: "${DOCKER_HOST_USER_NAME}"
     env_file: .env
     ports:
       - "${DOCKER_HOST_PORT:-4000}:${PORT:-4000}"
     user: "${DOCKER_HOST_USER_NAME}"
     volumes:
-      - "./lib:/home/${DOCKER_HOST_USER_NAME}/app/lib"
-      - "./config:/home/${DOCKER_HOST_USER_NAME}/app/config"
-      - "./deps:/deps/${DOCKER_HOST_USER_NAME}/app/deps"
-      - "./mix.exs:/deps/${DOCKER_HOST_USER_NAME}/app/mix.exs"
-      - "./mix.lock:/deps/${DOCKER_HOST_USER_NAME}/app/mix.lock"
+      - ".:/home/${DOCKER_HOST_USER_NAME}/app"
+      - "notUsed_build:/home/${DOCKER_HOST_USER_NAME}/app/_build"
+      - "notUsed_docker:/home/${DOCKER_HOST_USER_NAME}/app/docker"
+volumes:
+  notUsed_build:
+  notUsed_docker:

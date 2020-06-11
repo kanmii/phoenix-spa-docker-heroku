@@ -14,6 +14,9 @@ erl_crash.dump
 tags
 .vim
 *Dockerfile*
+*docker-compose*
+.dockerignore
 **/docker/data/
+heroku*
 .env*
 **/node_modules/

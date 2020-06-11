@@ -1,5 +1,19 @@
 import Config
 
+port =
+  System.get_env("PORT")
+  |> Kernel.||(
+    raise """
+    Environment variable PORT is missing, e.g 443.
+    Please provide one
+    """
+  )
+  |> String.to_integer()
+
+host = System.fetch_env!("HOST")
+
+check_origin = System.fetch_env!("CHECK_ORIGINS")
+
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information
 # when generating URLs.
@@ -10,8 +24,16 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 config :me, MeWeb.Endpoint,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  http: [
+    port: port,
+    transport_options: [socket_opts: [:inet6]]
+  ],
+  url: [
+    host: host,
+    port: port
+  ],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  check_origin: [check_origin]
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -50,6 +72,12 @@ config :logger, level: :info
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
-# Finally import the config/prod.secret.exs which loads secrets
-# and configuration from environment variables.
-import_config "prod.secret.exs"
+# ## Using releases (Elixir v1.9+)
+#
+# If you are doing OTP releases, you need to instruct Phoenix
+# to start each relevant endpoint:
+#
+#     config :me, MeWeb.Endpoint, server: true
+#
+# Then you can assemble a release by calling `mix release`.
+# See `mix help release` for more information.

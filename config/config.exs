@@ -7,13 +7,29 @@
 # General application configuration
 import Config
 
-database_url = System.get_env("DATABASE_URL")
+database_url = System.get_env("DATABASE_URL", "")
+
+secret_key_base = System.get_env("SECRET_KEY_BASE", "")
 
 port =
   System.get_env("PORT", "4000")
   |> String.to_integer()
 
 host = System.get_env("HOST", "localhost")
+
+pool_size =
+  System.get_env("POOL_SIZE")
+  |> Kernel.||("10")
+  |> String.to_integer()
+
+ssl =
+  case System.get_env("DATABASE_SSL") do
+    nil ->
+      false
+
+    _ ->
+      true
+  end
 
 config :me,
   ecto_repos: [Me.Repo]
@@ -22,16 +38,21 @@ config :me,
 config :me, Me.Repo,
   url: database_url,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: pool_size,
+  ssl: ssl
 
 # Configures the endpoint
 config :me, MeWeb.Endpoint,
   url: [host: host],
   http: [port: port],
-  secret_key_base: "4aTUwjX2u1fUoEAC/6p/ESROwg6zrud2JvtJ86hu5yVpB+fTXlC6wAESl6QwVoSW",
-  render_errors: [view: MeWeb.ErrorView, accepts: ~w(json), layout: false],
+  secret_key_base: secret_key_base,
+  render_errors: [
+    view: MeWeb.ErrorView,
+    accepts: ~w(json),
+    layout: false
+  ],
   pubsub_server: Me.PubSub,
-  live_view: [signing_salt: "r25Hzn6s"]
+  check_origin: false
 
 # Configures Elixir's Logger
 config :logger, :console,

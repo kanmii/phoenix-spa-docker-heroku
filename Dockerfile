@@ -1,9 +1,7 @@
 FROM elixir:1.9.4-slim AS dev
 
-ARG DOCKER_HOST_USER_NAME
-
-ARG APP_DEPS="openssl git"
-ARG HOME_VAR=/home/${DOCKER_HOST_USER_NAME}
+ARG APP_DEPS="openssl"
+ARG HOME_VAR=/home/me
 ARG APP_PATH=${HOME_VAR}/app
 
 RUN apt-get update \
@@ -12,17 +10,16 @@ RUN apt-get update \
   && rm -rf /usr/share/doc && rm -rf /usr/share/man \
   && apt-get clean
 
-RUN groupadd ${DOCKER_HOST_USER_NAME} && \
-  useradd -m -g ${DOCKER_HOST_USER_NAME} \
-  ${DOCKER_HOST_USER_NAME}
+RUN groupadd me && \
+  useradd -m -g me \
+  me
 
-USER ${DOCKER_HOST_USER_NAME}
+USER me
 
 RUN mix local.hex --force \
   && mix local.rebar --force
 
 USER root
-
 COPY ./docker/entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
@@ -33,12 +30,12 @@ COPY config config
 COPY . .
 RUN rm -rf docker
 
-RUN chown -R \
-  ${DOCKER_HOST_USER_NAME}:${DOCKER_HOST_USER_NAME} \
+RUN chown -R me:me \
   ${HOME_VAR}
 
-USER ${DOCKER_HOST_USER_NAME}
+USER me
 
-RUN mix do deps.get, deps.compile
+RUN mix do deps.get --only prod, deps.compile
+ENV MIX_ENV=prod
 
 CMD ["/bin/bash"]
