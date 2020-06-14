@@ -7,6 +7,15 @@ import Config
 database_url = System.fetch_env!("DATABASE_URL")
 secret_key_base = System.fetch_env!("SECRET_KEY_BASE")
 
+database_ssl =
+  case System.fetch_env!("DATABASE_SSL") do
+    "true" ->
+      true
+
+    _ ->
+      false
+  end
+
 port =
   System.fetch_env!("PORT")
   |> String.to_integer()
@@ -21,7 +30,8 @@ check_origin = System.fetch_env!("CHECK_ORIGINS")
 
 config :me, Me.Repo,
   url: database_url,
-  pool_size: pool_size
+  pool_size: pool_size,
+  ssl: database_ssl
 
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information

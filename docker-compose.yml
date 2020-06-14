@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: "${DATABASE_NAME:-my_app}"
+      POSTGRES_DB: "${DATABASE_NAME:-me_dev}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -33,9 +33,9 @@ services:
       - "${DOCKER_HOST_PORT:-4000}:${PORT:-4000}"
     user: "${DOCKER_HOST_USER_NAME}"
     volumes:
-      - ".:/home/${DOCKER_HOST_USER_NAME}/app"
-      - "notUsed_build:/home/${DOCKER_HOST_USER_NAME}/app/_build"
-      - "notUsed_docker:/home/${DOCKER_HOST_USER_NAME}/app/docker"
+      - ".:/home/${DOCKER_HOST_USER_NAME}/src"
+      - "notUsed_build:/home/${DOCKER_HOST_USER_NAME}/src/_build"
+      - "notUsed_docker:/home/${DOCKER_HOST_USER_NAME}/src/docker"
 volumes:
   notUsed_build:
   notUsed_docker:

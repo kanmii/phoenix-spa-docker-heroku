@@ -5,15 +5,17 @@ set -e
 TIMEOUT=60
 
 wait_for() {
+  echo -e "\n\n\n\n\n=========Running $@================\n\n\n"
+  eval "$@"
+
   for i in `seq $TIMEOUT` ; do
     result=$?
 
     if [ $result -eq 0 ] ; then
+      echo -e "\n\n\n\n\n========= Done running $@================\n\n\n"
       return 0
-
-      if [ $# -gt 0 ] ; then
-        exec "$@"
-      fi
+    else
+        eval "$@"
     fi
     sleep 1
   done

@@ -7,8 +7,7 @@ RUN apt-get update \
   && mix local.rebar --force \
   && mkdir -p /src
 
-ENV MIX_ENV=prod \
-  DATABASE_SSL=true
+ENV MIX_ENV=prod
 
 WORKDIR /src
 

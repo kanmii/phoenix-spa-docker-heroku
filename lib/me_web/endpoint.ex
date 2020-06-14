@@ -48,5 +48,14 @@ defmodule MeWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  unless Application.get_env(:me, :no_cors) do
+    plug(
+      Corsica,
+      origins: "*",
+      allow_headers: ~w(Accept Content-Type Authorization Origin)
+    )
+  end
+
   plug MeWeb.Router
 end

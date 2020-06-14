@@ -13,6 +13,9 @@ config :me, MeWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# We do not support CORS in production
+config :me, no_cors: true
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

@@ -22,15 +22,6 @@ pool_size =
   |> Kernel.||("10")
   |> String.to_integer()
 
-ssl =
-  case System.get_env("DATABASE_SSL") do
-    nil ->
-      false
-
-    _ ->
-      true
-  end
-
 config :me,
   ecto_repos: [Me.Repo]
 
@@ -38,8 +29,7 @@ config :me,
 config :me, Me.Repo,
   url: database_url,
   show_sensitive_data_on_connection_error: true,
-  pool_size: pool_size,
-  ssl: ssl
+  pool_size: pool_size
 
 # Configures the endpoint
 config :me, MeWeb.Endpoint,

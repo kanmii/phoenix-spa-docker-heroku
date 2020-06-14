@@ -7,6 +7,7 @@ defmodule MeWeb.Router do
 
   scope "/api", MeWeb do
     pipe_through :api
+    resources "/emails", EmailController, except: [:new, :edit]
   end
 
   scope "/", MeWeb do
