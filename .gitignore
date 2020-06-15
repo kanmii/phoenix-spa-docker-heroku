@@ -27,4 +27,5 @@ me-*.tar
 # this depending on your deployment strategy.
 /priv/static/
 .env-*
+!assets/.env-cmdrc.example.js
 docker/data
