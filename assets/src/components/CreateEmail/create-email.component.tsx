@@ -1,6 +1,6 @@
 import React, { useReducer, useCallback, MouseEvent } from "react";
 import Header from "../Header/header.component";
-import "./emails-comp.styles.scss";
+import "./create-email.styles.scss";
 import {
   Props,
   effectFunctions,
@@ -9,7 +9,7 @@ import {
   ActionType,
   CallerProps,
   FormField,
-} from "./emails-comp.utils";
+} from "./create-email.utils";
 import { FieldError } from "../../utils/common-errors";
 import FormCtrlError from "../FormCtrlError/form-ctrl-error.component";
 import {
@@ -18,15 +18,15 @@ import {
   submitId,
   notificationId,
   emailFieldId,
-} from "./emails-comp.dom";
+} from "./create-email.dom";
 import makeClassNames from "classnames";
 import { warningClassName, errorClassName } from "../../utils/utils.dom";
 import { StateValue, InputChangeEvent } from "../../utils/types";
 import { useRunEffects } from "../../utils/use-run-effects";
 import { formFieldErrorClass } from "../../utils/utils.dom";
-import { createEmailMutation } from "./emails-comp.injectables";
+import { createEmailMutation } from "./create-email.injectables";
 
-export function EmailsComp(props: Props) {
+export function CreateEmail(props: Props) {
   const [stateMachine, dispatch] = useReducer(reducer, undefined, initState);
 
   const {
@@ -181,7 +181,7 @@ function Email(props: FieldComponentProps) {
 
 // istanbul ignore next:
 export default (props: CallerProps) => {
-  return <EmailsComp {...props} login={createEmailMutation} />;
+  return <CreateEmail {...props} login={createEmailMutation} />;
 };
 
 interface FieldComponentProps {

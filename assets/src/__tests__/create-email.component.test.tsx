@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { ComponentType } from "react";
 import { render, cleanup, waitForElement, wait } from "@testing-library/react";
-import { EmailsComp } from "../components/EmailsComp/emails-comp.component";
+import { CreateEmail } from "../components/CreateEmail/create-email.component";
 import {
   emailInputId,
   emailErrorId,
   submitId,
   notificationId,
   emailFieldId,
-} from "../components/EmailsComp/emails-comp.dom";
+} from "../components/CreateEmail/create-email.dom";
 import {
   Props, //
   initState,
@@ -21,7 +21,7 @@ import {
   Action,
   ServerResponse,
   FormInput,
-} from "../components/EmailsComp/emails-comp.utils";
+} from "../components/CreateEmail/create-email.utils";
 import { CommonErrorsState } from "../utils/common-errors";
 import { fillField } from "../tests.utils";
 import {
@@ -34,14 +34,14 @@ import { getParentFieldEl } from "../tests.utils";
 import {
   createEmailMutation,
   onLoginSuccess,
-} from "../components/EmailsComp/emails-comp.injectables";
+} from "../components/CreateEmail/create-email.injectables";
 
 jest.mock("../components/Header/header.component", () => () => null);
 
 jest.mock("../utils/scroll-into-view");
 const mockScrollIntoView = scrollIntoView as jest.Mock;
 
-jest.mock("../components/EmailsComp/emails-comp.injectables");
+jest.mock("../components/CreateEmail/create-email.injectables");
 const mockLoginFn = createEmailMutation as jest.Mock;
 const mockOnLoginSuccess = onLoginSuccess as jest.Mock;
 
@@ -215,11 +215,11 @@ describe("reducer", () => {
 
 ////////////////////////// HELPER FUNCTIONS ///////////////////////////
 
-const EmailsCompP = EmailsComp as ComponentType<Partial<Props>>;
+const CreateEmailP = CreateEmail as ComponentType<Partial<Props>>;
 
 function makeComp({ props = {} }: { props?: Partial<{}> } = {}) {
   return {
-    ui: <EmailsCompP {...props} login={mockLoginFn} />,
+    ui: <CreateEmailP {...props} login={mockLoginFn} />,
   };
 }
 

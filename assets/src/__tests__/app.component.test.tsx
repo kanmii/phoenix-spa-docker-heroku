@@ -25,7 +25,7 @@ jest.mock("../components/Loading/loading.component", () => {
 });
 
 const mockLoginId = "b";
-jest.mock("../components/EmailsComp/emails-comp.component", () => {
+jest.mock("../components/CreateEmail/create-email.component", () => {
   return () => <div id={mockLoginId} />;
 });
 

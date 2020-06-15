@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import "./app.scss";
 import Loading from "../Loading/loading.component";
-import EmailsComp from "../EmailsComp/emails-comp.component";
+import CreateEmail from "../CreateEmail/create-email.component";
 import {
   reducer,
   initState,
@@ -41,7 +41,7 @@ function AppChild(props: { state: StateMachine }) {
 
   return (
     <div className="app-component">
-      <EmailsComp callerProp={true} />
+      <CreateEmail callerProp={true} />
 
       <ListEmails emails={emailsState} />
     </div>

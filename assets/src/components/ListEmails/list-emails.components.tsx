@@ -59,6 +59,7 @@ export function ListEmails(props: Props) {
       );
     }
 
+    // istanbul ignore next:
     default:
       throw new Error("not all cases handled");
   }

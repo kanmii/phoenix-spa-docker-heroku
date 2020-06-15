@@ -21,7 +21,7 @@ import {
 } from "../../utils/effects";
 import { FetchEmailsType } from "./app.injectables";
 import { scrollIntoView } from "../../utils/scroll-into-view";
-import { Email } from "../EmailsComp/emails-comp.utils";
+import { Email } from "../CreateEmail/create-email.utils";
 
 export enum ActionType {
   COMMON_ERROR = "@app/common-error",

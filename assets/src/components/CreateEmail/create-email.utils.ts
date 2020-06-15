@@ -29,7 +29,7 @@ import {
   GenericEffectDefinition,
   GenericHasEffect,
 } from "../../utils/effects";
-import { LoginMutationType, onLoginSuccess } from "./emails-comp.injectables";
+import { LoginMutationType, onLoginSuccess } from "./create-email.injectables";
 
 export enum ActionType {
   SUBMISSION = "@login/submission",
