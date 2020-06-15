@@ -24,8 +24,23 @@ defmodule MeWeb.EmailView do
     }
   end
 
+  def render("created.json", %{email: email}) do
+    %{
+      data: %{
+        __typename: "success",
+        email:
+          render_one(
+            email,
+            EmailView,
+            "email.json"
+          )
+      }
+    }
+  end
+
   def render("email.json", %{email: email}) do
     %{
+      __typename: "Email",
       id: email.id,
       email: email.email
     }

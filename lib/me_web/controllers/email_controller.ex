@@ -16,7 +16,7 @@ defmodule MeWeb.EmailController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.email_path(conn, :show, email))
-      |> render("show.json", email: email)
+      |> render("created.json", email: email)
     end
   end
 

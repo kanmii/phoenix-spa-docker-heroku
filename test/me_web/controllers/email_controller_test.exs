@@ -31,7 +31,7 @@ defmodule MeWeb.EmailControllerTest do
   describe "create email" do
     test "renders email when data is valid", %{conn: conn} do
       conn = post(conn, Routes.email_path(conn, :create), data: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"id" => id} = json_response(conn, 201)["data"]["email"]
 
       conn = get(conn, Routes.email_path(conn, :show, id))
 
