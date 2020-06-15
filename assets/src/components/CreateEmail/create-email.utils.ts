@@ -29,15 +29,17 @@ import {
   GenericEffectDefinition,
   GenericHasEffect,
 } from "../../utils/effects";
-import { LoginMutationType, onLoginSuccess } from "./create-email.injectables";
+import { CreateEmailMutationType } from "./create-email.injectables";
+import { AppChildProps, ActionType as AppActionType } from "../App/app.utils";
+import { unstable_batchedUpdates } from "react-dom";
 
 export enum ActionType {
-  SUBMISSION = "@login/submission",
-  SERVER_ERRORS = "@login/server-errors",
-  COMMON_ERROR = "@login/on-common-error",
-  CLOSE_SUBMIT_NOTIFICATION = "@login/close-submit-notification",
-  FORM_CHANGED = "@login/form-changed",
-  RESET_FORM_FIELDS = "@login/reset-form-fields",
+  SUBMISSION = "@create-email/submission",
+  SERVER_ERRORS = "@create-email/server-errors",
+  COMMON_ERROR = "@create-email/on-common-error",
+  CLOSE_SUBMIT_NOTIFICATION = "@create-email/close-submit-notification",
+  FORM_CHANGED = "@create-email/form-changed",
+  ENTRY_CREATE_SUCCESS = "@create-email/entry-create-success",
 }
 
 export const reducer: Reducer<StateMachine, Action> = (state, action) =>
@@ -66,7 +68,7 @@ export const reducer: Reducer<StateMachine, Action> = (state, action) =>
             proxy.states.submission.value = StateValue.inactive;
             break;
 
-          case ActionType.RESET_FORM_FIELDS:
+          case ActionType.ENTRY_CREATE_SUCCESS:
             handleResetFormFieldsAction(proxy);
             break;
 
@@ -157,7 +159,7 @@ function handleSubmissionAction(proxy: DraftState) {
   submission.value = StateValue.submitting;
 
   effects.push({
-    key: "loginEffect",
+    key: "createEmailEffect",
     ownArgs: { input },
   });
 }
@@ -333,17 +335,17 @@ const scrollIntoViewEffect: DefScrollToTopEffect["func"] = () => {
 
 type DefScrollToTopEffect = EffectDefinition<"scrollIntoViewEffect", {}>;
 
-const loginEffect: DefLoginEffect["func"] = async (
+const createEmailEffect: DefCreateEmailEffect["func"] = async (
   ownArgs,
   props,
   effectArgs,
 ) => {
-  const { login } = props;
+  const { createEntry, appDispatch } = props;
   const { input } = ownArgs;
   const { dispatch } = effectArgs;
 
   try {
-    const response = await login(input);
+    const response = await createEntry(input);
 
     const validResponse = response && response.data && response.data;
 
@@ -364,8 +366,18 @@ const loginEffect: DefLoginEffect["func"] = async (
 
       return;
     } else {
-      const { email: success } = validResponse;
-      onLoginSuccess(success);
+      const { email } = validResponse;
+
+      unstable_batchedUpdates(() => {
+        appDispatch({
+          type: AppActionType.CREATE_EMAIL_SUCCESS,
+          email,
+        });
+
+        dispatch({
+          type: ActionType.ENTRY_CREATE_SUCCESS,
+        });
+      });
     }
   } catch (error) {
     dispatch({
@@ -375,8 +387,8 @@ const loginEffect: DefLoginEffect["func"] = async (
   }
 };
 
-type DefLoginEffect = EffectDefinition<
-  "loginEffect",
+type DefCreateEmailEffect = EffectDefinition<
+  "createEmailEffect",
   {
     input: FormInput;
   }
@@ -384,7 +396,7 @@ type DefLoginEffect = EffectDefinition<
 
 export const effectFunctions = {
   scrollIntoViewEffect,
-  loginEffect,
+  createEmailEffect,
 };
 
 ////////////////////////// END EFFECTS SECTION /////////////////////////
@@ -416,8 +428,6 @@ interface FormInValid {
     };
   };
 }
-
-////////////////////////// STRINGY TYPES SECTION ///////////
 
 type Submission =
   | Readonly<{
@@ -501,18 +511,18 @@ export type Action =
   | ({
       type: ActionType.FORM_CHANGED;
     } & FormChangedPayload)
-  | {
-      type: ActionType.RESET_FORM_FIELDS;
-    }
   | ({
       type: ActionType.SERVER_ERRORS;
-    } & ServerErrorPayload);
+    } & ServerErrorPayload)
+  | {
+      type: ActionType.ENTRY_CREATE_SUCCESS;
+    };
 
-export interface CallerProps {
+export type CallerProps = AppChildProps & {
   callerProp: boolean;
-}
+};
 
-export type Props = CallerProps & LoginMutationType;
+export type Props = CallerProps & CreateEmailMutationType;
 
 export interface EffectArgs {
   dispatch: Dispatch<Action>;
@@ -523,7 +533,7 @@ type EffectDefinition<
   OwnArgs = {}
 > = GenericEffectDefinition<EffectArgs, Props, Key, OwnArgs>;
 
-type EffectType = DefLoginEffect | DefScrollToTopEffect;
+type EffectType = DefCreateEmailEffect | DefScrollToTopEffect;
 export type EffectState = GenericHasEffect<EffectType>;
 type EffectList = EffectType[];
 

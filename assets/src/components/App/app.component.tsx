@@ -8,6 +8,7 @@ import {
   effectFunctions,
   Props,
   StateMachine,
+  DispatchType,
 } from "./app.utils";
 import { useRunEffects } from "../../utils/use-run-effects";
 import { hot } from "react-hot-loader";
@@ -28,20 +29,21 @@ export function App(props: Props) {
   return emailsState.value === StateValue.fetching ? (
     <Loading />
   ) : (
-    <AppChild state={stateMachine} />
+    <AppChild state={stateMachine} dispatch={dispatch} />
   );
 }
 
-function AppChild(props: { state: StateMachine }) {
+function AppChild(props: { state: StateMachine; dispatch: DispatchType }) {
   const {
     state: {
       states: { emails: emailsState },
     },
+    dispatch,
   } = props;
 
   return (
     <div className="app-component">
-      <CreateEmail callerProp={true} />
+      <CreateEmail callerProp={true} appDispatch={dispatch} />
 
       <ListEmails emails={emailsState} />
     </div>

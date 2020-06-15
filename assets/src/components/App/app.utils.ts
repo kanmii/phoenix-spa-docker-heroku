@@ -26,6 +26,7 @@ import { Email } from "../CreateEmail/create-email.utils";
 export enum ActionType {
   COMMON_ERROR = "@app/common-error",
   SERVER_SUCCESS = "@app/server-success",
+  CREATE_EMAIL_SUCCESS = "@app/create-email-success",
 }
 
 export const reducer: Reducer<StateMachine, Action> = (state, action) =>
@@ -45,6 +46,12 @@ export const reducer: Reducer<StateMachine, Action> = (state, action) =>
           case ActionType.SERVER_SUCCESS:
             handleServerSuccessAction(proxy, payload as ServerSuccessPayload);
             break;
+
+          case ActionType.CREATE_EMAIL_SUCCESS:
+            handleEmailCreatedAction(
+              proxy,
+              payload as CreateEmailSuccessPayload,
+            );
         }
       });
     },
@@ -127,6 +134,33 @@ function handleServerSuccessAction(
     };
   } else {
     (success as Draft<EmailsEmpty>).value = StateValue.empty;
+  }
+}
+
+function handleEmailCreatedAction(
+  proxy: DraftState,
+  payload: CreateEmailSuccessPayload,
+) {
+  const {
+    states: { emails },
+  } = proxy;
+
+  const { email } = payload;
+  const emailsSuccess = emails as Draft<EmailsSuccess>;
+
+  switch (emails.value) {
+    case StateValue.success:
+      emails.success.context.emails.unshift(email);
+      break;
+
+    default:
+      emailsSuccess.value = StateValue.success;
+      emailsSuccess.success = {
+        context: {
+          emails: [email],
+        },
+      };
+      break;
   }
 }
 
@@ -221,17 +255,30 @@ type ServerSuccessPayload = Readonly<{
   emails: ServerResponse["data"];
 }>;
 
+type CreateEmailSuccessPayload = Readonly<{
+  email: Email;
+}>;
+
 export type Action =
   | ({
       type: ActionType.COMMON_ERROR;
     } & StringyErrorPayload)
   | ({
       type: ActionType.SERVER_SUCCESS;
-    } & ServerSuccessPayload);
+    } & ServerSuccessPayload)
+  | ({
+      type: ActionType.CREATE_EMAIL_SUCCESS;
+    } & CreateEmailSuccessPayload);
 
 export interface EffectArgs {
-  dispatch: Dispatch<Action>;
+  dispatch: DispatchType;
 }
+
+export type DispatchType = Dispatch<Action>;
+
+export type AppChildProps = {
+  appDispatch: DispatchType;
+};
 
 export type Props = FetchEmailsType;
 

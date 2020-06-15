@@ -31,10 +31,7 @@ import {
 import { scrollIntoView } from "../utils/scroll-into-view";
 import { formFieldErrorClass } from "../utils/utils.dom";
 import { getParentFieldEl } from "../tests.utils";
-import {
-  createEmailMutation,
-  onLoginSuccess,
-} from "../components/CreateEmail/create-email.injectables";
+import { createEmailMutation } from "../components/CreateEmail/create-email.injectables";
 
 jest.mock("../components/Header/header.component", () => () => null);
 
@@ -42,8 +39,9 @@ jest.mock("../utils/scroll-into-view");
 const mockScrollIntoView = scrollIntoView as jest.Mock;
 
 jest.mock("../components/CreateEmail/create-email.injectables");
-const mockLoginFn = createEmailMutation as jest.Mock;
-const mockOnLoginSuccess = onLoginSuccess as jest.Mock;
+const mockCreateEmailMutation = createEmailMutation as jest.Mock;
+
+const mockAppDispatch = jest.fn();
 
 let stateMachine = (null as unknown) as StateMachine;
 
@@ -54,7 +52,7 @@ afterEach(() => {
 });
 
 describe("components", () => {
-  it("reset/form errors/login success", async () => {
+  it("reset/form errors/create email success", async () => {
     const { ui } = makeComp();
     render(ui);
 
@@ -94,15 +92,15 @@ describe("components", () => {
     const validEmailVal = "a@b.com";
     fillField(emailInputEl, validEmailVal);
 
-    const success = {
+    const createdEmail = {
       id: "1",
       email: "a",
     };
 
-    mockLoginFn.mockResolvedValueOnce({
+    mockCreateEmailMutation.mockResolvedValueOnce({
       data: {
         __typename: "success",
-        email: success,
+        email: createdEmail,
       },
     } as ServerResponse);
 
@@ -110,13 +108,13 @@ describe("components", () => {
 
     await wait(() => true);
 
-    const calls = mockLoginFn.mock.calls[0][0] as FormInput;
+    const calls = mockCreateEmailMutation.mock.calls[0][0] as FormInput;
 
     expect(calls).toEqual({
       email: validEmailVal,
     } as FormInput);
 
-    expect(mockOnLoginSuccess).toHaveBeenCalledWith(success);
+    expect(mockAppDispatch.mock.calls[0][0].email).toEqual(createdEmail);
   });
 
   it("reset/server errors", async () => {
@@ -131,7 +129,7 @@ describe("components", () => {
     const emailVal = "a@b.com";
     fillField(emailInputEl, emailVal);
 
-    mockLoginFn.mockResolvedValue({
+    mockCreateEmailMutation.mockResolvedValue({
       data: {
         __typename: "errors",
         errors: {
@@ -153,14 +151,16 @@ describe("components", () => {
 });
 
 describe("reducer", () => {
-  const props = ({ login: mockLoginFn } as unknown) as Props;
+  const props = ({
+    createEntry: mockCreateEmailMutation,
+  } as unknown) as Props;
 
   const effectArgs = {
     dispatch: mockDispatch as any,
   } as EffectArgs;
 
-  test("submission/invalid response", async () => {
-    mockLoginFn.mockResolvedValue({});
+  it("submission/invalid response", async () => {
+    mockCreateEmailMutation.mockResolvedValue({});
     await submitAndRunEffect();
 
     expect(
@@ -169,8 +169,8 @@ describe("reducer", () => {
     ).toBeDefined();
   });
 
-  test("submission/exception", async () => {
-    mockLoginFn.mockRejectedValue(new Error("a"));
+  it("submission/exception", async () => {
+    mockCreateEmailMutation.mockRejectedValue(new Error("a"));
     await submitAndRunEffect();
 
     expect(
@@ -219,7 +219,13 @@ const CreateEmailP = CreateEmail as ComponentType<Partial<Props>>;
 
 function makeComp({ props = {} }: { props?: Partial<{}> } = {}) {
   return {
-    ui: <CreateEmailP {...props} login={mockLoginFn} />,
+    ui: (
+      <CreateEmailP
+        {...props}
+        createEntry={mockCreateEmailMutation}
+        appDispatch={mockAppDispatch}
+      />
+    ),
   };
 }
 

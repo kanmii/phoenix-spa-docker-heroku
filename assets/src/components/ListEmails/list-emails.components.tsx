@@ -2,6 +2,11 @@ import React from "react";
 import "./list-emails.scss";
 import { CallerProps, Props } from "./list-emails.utils";
 import { StateValue } from "../../utils/types";
+import {
+  emptyEmailsSelector,
+  fetchEmailsErrorSelector,
+  deleteEmailSelector,
+} from "./list-emails.dom";
 
 export function ListEmails(props: Props) {
   const { emails } = props;
@@ -36,7 +41,7 @@ export function ListEmails(props: Props) {
                   </div>
 
                   <div className="media-right">
-                    <button className="delete"></button>
+                    <button className={`delete ${deleteEmailSelector}`} />
                   </div>
                 </div>
               </div>
@@ -47,14 +52,25 @@ export function ListEmails(props: Props) {
     }
 
     case StateValue.empty: {
-      return <div> No emails yet. Be the first to add your email. </div>;
+      return (
+        <div className={emptyEmailsSelector}>
+          No emails yet. Be the first to add your email.
+        </div>
+      );
     }
 
     case StateValue.commonErrors: {
       return (
-        <div>
-          Errors were encountered while fetching emails:{" "}
-          {emails.commonErrors.context.errors}
+        <div className={fetchEmailsErrorSelector}>
+          <div className="message is-danger">
+            <div className="message-header">
+              <p>Error while fetching emails</p>
+            </div>
+            <div className="message-body">
+              <div>Error message:</div>
+              {emails.commonErrors.context.errors}
+            </div>
+          </div>
         </div>
       );
     }
@@ -65,6 +81,7 @@ export function ListEmails(props: Props) {
   }
 }
 
+// istanbul ignore next:
 export default (props: CallerProps) => {
   return (
     <div className="list-emails-component">

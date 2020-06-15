@@ -18,15 +18,20 @@ import { fetchEmailsFn } from "../components/App/app.injectables";
 import { scrollIntoView } from "../utils/scroll-into-view";
 import { StateValue } from "../utils/types";
 import { CommonErrorsState } from "../utils/common-errors";
+import { Email } from "../components/CreateEmail/create-email.utils";
 
 const mockLoadingId = "a";
 jest.mock("../components/Loading/loading.component", () => {
   return () => <div id={mockLoadingId} />;
 });
 
-const mockLoginId = "b";
+const mockCreateEmailId = "b";
 jest.mock("../components/CreateEmail/create-email.component", () => {
-  return () => <div id={mockLoginId} />;
+  return () => <div id={mockCreateEmailId} />;
+});
+
+jest.mock("../components/ListEmails/list-emails.components", () => {
+  return () => null;
 });
 
 jest.mock("../components/App/app.injectables");
@@ -44,10 +49,6 @@ afterEach(() => {
   mockState = null as any;
 });
 
-afterAll(() => {
-  delete window.fetchErrors;
-});
-
 describe("components", () => {
   it("fetch error", async () => {
     mockFetchEmailsFn.mockRejectedValue(new Error("a"));
@@ -56,13 +57,13 @@ describe("components", () => {
 
     render(ui);
     expect(document.getElementById(mockLoadingId)).not.toBeNull();
-    expect(document.getElementById(mockLoginId)).toBeNull();
+    expect(document.getElementById(mockCreateEmailId)).toBeNull();
     expect(mockScrollIntoView).not.toHaveBeenCalled();
 
     await wait(() => true);
 
     expect(document.getElementById(mockLoadingId)).toBeNull();
-    expect(document.getElementById(mockLoginId)).not.toBeNull();
+    expect(document.getElementById(mockCreateEmailId)).not.toBeNull();
     expect(mockScrollIntoView).toHaveBeenCalled();
   });
 
@@ -75,12 +76,12 @@ describe("components", () => {
 
     render(ui);
     expect(document.getElementById(mockLoadingId)).not.toBeNull();
-    expect(document.getElementById(mockLoginId)).toBeNull();
+    expect(document.getElementById(mockCreateEmailId)).toBeNull();
 
     await wait(() => true);
 
     expect(document.getElementById(mockLoadingId)).toBeNull();
-    expect(document.getElementById(mockLoginId)).not.toBeNull();
+    expect(document.getElementById(mockCreateEmailId)).not.toBeNull();
   });
 });
 
@@ -163,6 +164,42 @@ describe("reducer", () => {
     expect(
       (emailsState as CommonErrorsState).commonErrors.context.errors,
     ).toBeDefined();
+  });
+
+  it("create email success", async () => {
+    mockState = initState();
+
+    expect(mockState.states.emails.value).toBe(StateValue.fetching);
+
+    const email1 = {
+      id: "a",
+      email: "a",
+    } as Email;
+
+    mockState = reducer(mockState, {
+      type: ActionType.CREATE_EMAIL_SUCCESS,
+      email: email1,
+    });
+
+    expect(mockState.states.emails.value).toBe(StateValue.success);
+
+    expect(
+      (mockState.states.emails as EmailsSuccess).success.context.emails,
+    ).toEqual([email1]);
+
+    const email2 = {
+      id: "b",
+      email: "b",
+    } as Email;
+
+    mockState = reducer(mockState, {
+      type: ActionType.CREATE_EMAIL_SUCCESS,
+      email: email2,
+    });
+
+    expect(
+      (mockState.states.emails as EmailsSuccess).success.context.emails,
+    ).toEqual([email2, email1]);
   });
 });
 

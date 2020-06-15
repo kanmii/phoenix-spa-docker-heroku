@@ -181,7 +181,7 @@ function Email(props: FieldComponentProps) {
 
 // istanbul ignore next:
 export default (props: CallerProps) => {
-  return <CreateEmail {...props} login={createEmailMutation} />;
+  return <CreateEmail {...props} createEntry={createEmailMutation} />;
 };
 
 interface FieldComponentProps {
