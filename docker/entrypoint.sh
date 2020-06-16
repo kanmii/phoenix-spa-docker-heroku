@@ -28,7 +28,7 @@ if [ "$MIX_ENV" == "prod" ]; then
   wait_for bin/me eval "Me.Release.migrate"
   bin/me start
 else
-  wait_for mix ecto.migrate
+  wait_for 'mix ecto.create && mix ecto.migrate'
 
   node_name="${DEV_NODE_NAME:-$MIX_ENV}"
   cookie="${DEV_COOKIE:-"me-cookie"}"

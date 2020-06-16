@@ -65,7 +65,7 @@ Or run `docker ps` in another shell to obtain your `container_id`
 cp .env.example .env-test
 ```
 
-Edit `.env-test` set testing environment variables
+Edit `.env-test` to set testing environment variables
 
 Do not forget to set `MIX_ENV` to `test` and set `DATABASE_URL` appropriately
 
