@@ -2,7 +2,8 @@ FROM elixir:1.9.4-slim AS build
 
 ENV BUILD_DEPS="curl gnupg ca-certificates" \
     APP_DEPS="" \
-    MIX_ENV=prod
+    MIX_ENV=prod \
+    NODE_ENV=production
 
 RUN apt-get update \
   && apt-get install -y ${BUILD_DEPS} ${APP_DEPS} --no-install-recommends \
@@ -24,9 +25,10 @@ WORKDIR /src
 COPY . .
 
 RUN cd assets \
+  && rm -rf build \
   && yarn config set strict-ssl false \
-  && yarn install \
-  && yarn start build \
+  && yarn install --production \
+  && yarn build \
   && cd .. \
   && mix do deps.get --only prod, compile \
   && mix release \

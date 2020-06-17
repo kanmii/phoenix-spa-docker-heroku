@@ -4,6 +4,7 @@ const { apiUrlReactEnv, noLogReactEnv } = require("./src/utils/env-variables");
 
 const distFolderName = "build";
 const reactScript = "react-app-rewired";
+// const reactScript = "react-scripts";
 
 const test = `env-cmd -e test yarn ${reactScript} test --runInBand`;
 const startServer = `yarn react-scripts start`;
@@ -25,7 +26,7 @@ function buildFn(flag) {
   const envStmt = `env-cmd -e ${env}`;
 
   return `${preBuild} && \
-  ${apiUrlReactEnv}=${settings.prod.API_URL} \
+    ${apiUrlReactEnv}=${settings.prod.API_URL} \
     ${noLogReactEnv}=true \
     ${envStmt} ${reactBuild}
 `;

@@ -1,4 +1,5 @@
 import React, { useReducer } from "react";
+import { hot } from "react-hot-loader/root";
 import "./app.scss";
 import Loading from "../Loading/loading.component";
 import CreateEmail from "../CreateEmail/create-email.component";
@@ -11,7 +12,6 @@ import {
   DispatchType,
 } from "./app.utils";
 import { useRunEffects } from "../../utils/use-run-effects";
-import { hot } from "react-hot-loader";
 import { StateValue } from "../../utils/types";
 import { fetchEmailsFn } from "./app.injectables";
 import ListEmails from "../ListEmails/list-emails.components";
@@ -51,6 +51,11 @@ function AppChild(props: { state: StateMachine; dispatch: DispatchType }) {
 }
 
 // istanbul ignore next:
-export default hot(module)(() => {
+function DefaultApp() {
   return <App fetchEmails={fetchEmailsFn} />;
-});
+}
+
+// istanbul ignore next:
+export default process.env.NODE_ENV !== "production"
+  ? hot(DefaultApp)
+  : DefaultApp;

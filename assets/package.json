@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nps",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build": "NODE_ENV=production TSC_COMPILE_ON_ERROR=true yarn react-scripts build"
   },
   "dependencies": {
     "bulma": "^0.8.2",
@@ -12,11 +13,12 @@
     "immer": "^6.0.3",
     "lodash": "^4.17.15",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
-  },
-  "devDependencies": {
-    "@hot-loader/react-dom": "^16.13.0",
+    "react-dom": "npm:@hot-loader/react-dom",
+    "react-scripts": "3.4.1",
+    "react-hot-loader": "^4.12.20",
+    "node-sass": "^4.14.0",
+    "react-app-rewire-hot-loader": "^2.0.1",
+    "react-app-rewired": "^2.1.5",
     "@testing-library/react": "^9.3.2",
     "@types/classnames": "^2.2.10",
     "@types/jest": "^24.0.0",
@@ -24,14 +26,9 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "env-cmd": "^10.1.0",
-    "node-sass": "^4.14.0",
     "nps": "^5.9.12",
     "prettier": "^2.0.5",
-    "react-app-rewire-hot-loader": "^2.0.1",
-    "react-app-rewired": "^2.1.5",
-    "react-hot-loader": "^4.12.20",
     "serve": "^11.3.0",
-    "start-server-and-test": "^1.11.0",
     "typescript": "~3.7.2"
   },
   "eslintConfig": {
