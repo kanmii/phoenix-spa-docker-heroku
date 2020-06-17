@@ -2,6 +2,12 @@
 import { apiUrlReactEnv } from "./env-variables";
 
 export function getBackendUrls(uri?: string) {
+  if (process.env.NODE_ENV === "production") {
+    return {
+      apiUrl: "/api",
+    };
+  }
+
   const apiUrl = uri || process.env[apiUrlReactEnv];
 
   if (!apiUrl) {
@@ -14,7 +20,5 @@ export function getBackendUrls(uri?: string) {
 
   return {
     apiUrl: url.href,
-    websocketUrl: url.href.replace("http", "ws").replace(/\/?$/, "/socket"),
-    root: url.origin,
   };
 }

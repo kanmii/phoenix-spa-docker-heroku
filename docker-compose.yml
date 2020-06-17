@@ -34,8 +34,11 @@ services:
     user: "${DOCKER_HOST_USER_NAME}"
     volumes:
       - ".:/home/${DOCKER_HOST_USER_NAME}/src"
+      - "./assets/build:/home/${DOCKER_HOST_USER_NAME}/src/assets/build"
       - "notUsed_build:/home/${DOCKER_HOST_USER_NAME}/src/_build"
       - "notUsed_docker:/home/${DOCKER_HOST_USER_NAME}/src/docker"
+      - "notUsed_assets:/home/${DOCKER_HOST_USER_NAME}/src/assets"
 volumes:
   notUsed_build:
   notUsed_docker:
+  notUsed_assets:

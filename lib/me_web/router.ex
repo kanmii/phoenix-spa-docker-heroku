@@ -1,6 +1,10 @@
 defmodule MeWeb.Router do
   use MeWeb, :router
 
+  pipeline :browser do
+    plug :accepts, ["html"]
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -11,6 +15,7 @@ defmodule MeWeb.Router do
   end
 
   scope "/", MeWeb do
-    get("/*path", IndexController, :index)
+    pipe_through :browser
+    get "/*path", PageController, :index
   end
 end

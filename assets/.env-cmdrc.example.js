@@ -1,7 +1,7 @@
 module.exports = {
   dev: {
     PORT: "4021",
-    API_URL: "http://localhost:4023",
+    API_URL: "http://localhost:4023/api",
     BROWSER: "none",
     EXTEND_ESLINT: true,
     TSC_COMPILE_ON_ERROR: true,

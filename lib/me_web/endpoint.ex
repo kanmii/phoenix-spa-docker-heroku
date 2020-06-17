@@ -22,9 +22,18 @@ defmodule MeWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :me,
+    from: "assets/build",
     gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(
+      index.html
+      static
+      icons
+      asset-manifest.json
+      manifest.json
+      precache-manifest
+      robots.txt
+      service-worker.js
+    )
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

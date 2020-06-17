@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const settings = require("./.env-cmdrc");
-const {
-  apiUrlReactEnv,
-  regServiceWorkerReactEnv,
-  noLogReactEnv,
-} = require("./src/utils/env-variables");
+const { apiUrlReactEnv, noLogReactEnv } = require("./src/utils/env-variables");
 
 const distFolderName = "build";
 const reactScript = "react-app-rewired";
@@ -14,8 +10,7 @@ const startServer = `yarn react-scripts start`;
 
 function buildFn(flag) {
   const reactBuild = `yarn ${reactScript} build`;
-  const preBuild = `rimraf ${distFolderName}`;
-  const startSw = "yarn start serviceWorker";
+  const preBuild = `rimraf ${distFolderName}/*`;
 
   let env;
 
@@ -31,10 +26,8 @@ function buildFn(flag) {
 
   return `${preBuild} && \
   ${apiUrlReactEnv}=${settings.prod.API_URL} \
-    ${regServiceWorkerReactEnv}=${settings.prod.register_service_worker} \
     ${noLogReactEnv}=true \
-    ${envStmt} ${reactBuild} && \
-  ${envStmt} ${startSw}
+    ${envStmt} ${reactBuild}
 `;
 }
 
@@ -43,11 +36,10 @@ module.exports = {
     dev: `REACT_APP_API_URL=${settings.dev.API_URL} env-cmd -e dev ${startServer}`,
     e2eDev: `REACT_APP_API_URL=${settings.e2eDev.API_URL} env-cmd -e e2eDev ${startServer}`,
     build: {
-      deploy: buildFn("prod") + "  && yarn start netlify",
+      default: buildFn("prod"),
       serve: {
         prod: `${buildFn("prod")} yarn start serve`,
       },
-      prod: buildFn("prod"),
     },
     test: {
       default: `CI=true ${test}`,
