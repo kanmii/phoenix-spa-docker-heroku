@@ -15,6 +15,27 @@ defmodule Me.Release do
     end
   end
 
+  def create do
+    load_app()
+
+    for repo <- repos() do
+      create_repo(repo)
+    end
+  end
+
+  defp create_repo(repo) do
+    case repo.__adapter__.storage_up(repo.config) do
+      :ok ->
+        "The database for #{inspect(repo)} has been created"
+
+      {:error, :already_up} ->
+        "The database for #{inspect(repo)} has already been created"
+
+      {:error, term} ->
+        raise "The database for #{inspect(repo)} couldn't be created: #{inspect(term)}"
+    end
+  end
+
   def rollback(repo, version) do
     load_app()
 
