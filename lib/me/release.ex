@@ -5,8 +5,6 @@ defmodule Me.Release do
     load_app()
 
     for repo <- repos() do
-      IO.inspect(repo)
-
       {:ok, _, _} =
         Ecto.Migrator.with_repo(
           repo,
