@@ -145,15 +145,6 @@ Restart postgres server
 pg_ctl restart 
 ```
 
-
-Create the database
-
-
-```
-psql postgres -c 'create database db_name'
-```
-
-
 Inside `.env-prod`, set `$DOCKER_ADD_DB_HOST` and run
 
 ```
@@ -177,12 +168,6 @@ Start a postgres container
 docker run -d --name postgres-container-name -e POSTGRES_PASSWORD=password postgres:12.2
 ```
 
-
-Create the database
-
-```
-docker exec postgres-container-name psql postgres postgres -c 'create database me_prod'
-```
 
 Start phoenix app, linking the database host to the running postgres container
 
