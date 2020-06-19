@@ -10,11 +10,9 @@ RUN apt-get update \
   && apt-get install -y ${APP_DEPS} --no-install-recommends \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /usr/share/doc && rm -rf /usr/share/man \
-  && apt-get clean
-
-RUN groupadd ${DOCKER_HOST_USER_NAME} && \
-  useradd -m -g ${DOCKER_HOST_USER_NAME} \
-  ${DOCKER_HOST_USER_NAME}
+  && apt-get clean \
+  && groupadd ${DOCKER_HOST_USER_NAME} \
+  && useradd -m -g ${DOCKER_HOST_USER_NAME} ${DOCKER_HOST_USER_NAME}
 
 # hex has to be installed as the user that will compile and run our app
 USER ${DOCKER_HOST_USER_NAME}
