@@ -25,8 +25,12 @@ wait_for() {
 }
 
 if [ "$MIX_ENV" == "prod" ]; then
-  # wait_for bin/me eval "Me.Release.create"
-  wait_for bin/me eval "Me.Release.migrate"
+  if [ -n "$CREATE_DATABASE" ]; then
+    wait_for bin/me eval "Me.Release.create"
+  else
+    wait_for bin/me eval "Me.Release.migrate"
+  fi
+
   bin/me start
 else
   node_name="${DEV_NODE_NAME:-$MIX_ENV}"
