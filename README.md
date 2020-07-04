@@ -113,7 +113,7 @@ And set `MIX_ENV` to `prod`
 Build the docker image:
 
 ```
-docker build -t me-prod .
+docker build --build-arg DOCKER_HOST_USER_NAME -t me-prod .
 ```
 
 A docker image named `me-prod` will be built

@@ -1,35 +1,67 @@
-FROM elixir:1.9.4-slim AS build
+FROM hexpm/elixir:1.9.4-erlang-22.3.4.2-debian-buster-20200511 AS dev
 
-ENV BUILD_DEPS="curl gnupg ca-certificates" \
-    APP_DEPS="" \
-    MIX_ENV=prod \
-    NODE_ENV=production
+ARG DOCKER_HOST_USER_NAME
+
+ENV APP_DEPS="openssl" \
+  HOME_VAR=/home/${DOCKER_HOST_USER_NAME}
 
 RUN apt-get update \
-  && apt-get install -y ${BUILD_DEPS} ${APP_DEPS} --no-install-recommends \
+  && apt-get install -y ${APP_DEPS} --no-install-recommends \
+  && groupadd ${DOCKER_HOST_USER_NAME} \
+  && useradd -m -g ${DOCKER_HOST_USER_NAME} ${DOCKER_HOST_USER_NAME} \
+  && mkdir -p ${HOME_VAR}/src/assets
+
+COPY ./docker/entrypoint.sh /usr/local/bin
+
+WORKDIR ${HOME_VAR}/src
+
+COPY . .
+
+RUN chown -R \
+  ${DOCKER_HOST_USER_NAME}:${DOCKER_HOST_USER_NAME} \
+  ${HOME_VAR} \
+  && rm -rf docker \
+  && chmod +x /usr/local/bin/entrypoint.sh
+
+# run app as non root user to avoid volume mount problems
+USER ${DOCKER_HOST_USER_NAME}
+
+# hex has to be installed as the user that will compile and run our app
+RUN mix local.hex --force \
+  && mix local.rebar --force \
+  && mix do deps.get, deps.compile
+
+CMD ["/bin/bash"]
+
+############################### build image ###############################
+
+FROM dev AS build
+
+ENV BUILD_DEPS="curl gnupg ca-certificates" \
+  APP_DEPS="" \
+  MIX_ENV=prod \
+  NODE_ENV=production
+
+USER root
+
+RUN apt-get install -y ${BUILD_DEPS} ${APP_DEPS} --no-install-recommends \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | \
-    tee /etc/apt/sources.list.d/yarn.list \
+  tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update \
   && apt-get install -y yarn \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /usr/share/doc && rm -rf /usr/share/man \
   && apt-get purge -y --auto-remove ${BUILD_DEPS} \
   && apt-get clean \
-  && mix local.hex --force \
-  && mix local.rebar --force \
-  && mkdir -p /src
-
-WORKDIR /src
-
-COPY . .
-
-RUN cd assets \
+  && cd assets \
   && rm -rf build \
   && yarn config set strict-ssl false \
   && yarn install --production \
   && yarn build \
   && cd .. \
+  && mix local.hex --force \
+  && mix local.rebar --force \
   && mix do deps.get --only prod, compile \
   && mix release \
   && mv assets/build ./frontend \
@@ -37,14 +69,14 @@ RUN cd assets \
   && rm -rf docker \
   && rm -rf deps
 
-CMD ["/bin/bash"]
-
 ############################ prepare release image ###########################
 
 FROM debian:buster AS release
 
+ARG DOCKER_HOST_USER_NAME
+
 ENV APP_DEPS="openssl" \
-    LANG=C.UTF-8
+  LANG=C.UTF-8
 
 RUN apt-get update \
   && apt-get install -y ${APP_DEPS} --no-install-recommends \
@@ -62,8 +94,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /me-app
 
-COPY --from=build --chown=me:me /src/_build/prod/rel/me ./
-COPY --from=build --chown=me:me /src/frontend ./assets/build
+COPY --from=build --chown=me:me /home/${DOCKER_HOST_USER_NAME}/src/_build/prod/rel/me ./
+
+COPY --from=build --chown=me:me /home/${DOCKER_HOST_USER_NAME}/src/frontend ./assets/build
 
 USER me
 

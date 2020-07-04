@@ -1,6 +1,7 @@
 import Config
 
-config :me, Me.Repo, show_sensitive_data_on_connection_error: false
+config :me, Me.Repo,
+  show_sensitive_data_on_connection_error: false
 
 # Do not print debug messages in production
 config :logger, level: :info
