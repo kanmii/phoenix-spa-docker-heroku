@@ -3,6 +3,8 @@ setup:
     - plan: heroku-postgresql:hobby-dev
       as: db
 build:
+  config:
+    DOCKER_HOST_USER_NAME: me
   docker:
     web: Dockerfile
 release:
