@@ -3,11 +3,11 @@ services:
   db:
     image: postgres:12.2
     ports:
-      - "${DOCKER_HOST_DATABASE_PORT:-127.0.0.1:15432}:5432"
+      - "${DOCKER_HOST_DATABASE_PORT}:5432"
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: "${DATABASE_NAME:-me_dev}"
+      POSTGRES_DB: "${DATABASE_NAME}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -15,7 +15,7 @@ services:
       retries: 5
       start_period: 10s
     volumes:
-      - "./docker/data/postgres-${MIX_ENV:-dev}:/var/lib/postgresql/data"
+      - "./docker/data/postgres-${MIX_ENV}:/var/lib/postgresql/data"
 
   api:
     build:
@@ -26,19 +26,28 @@ services:
     image: me-dev
     depends_on:
       - "db"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --head --fail http://${BACKEND_SERVER_HOST}:${PORT}${BACKEND_HEALTH_CHECK_URL}"]
+      interval: 600s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
     user: "${DOCKER_HOST_USER_NAME}"
-    env_file: .env
+    env_file: ".env-${MIX_ENV}"
     ports:
-      - "${DOCKER_HOST_PORT:-4000}:${PORT:-4000}"
+      - "${DOCKER_HOST_API_PORT}:${PORT}"
     user: "${DOCKER_HOST_USER_NAME}"
     volumes:
       - ".:/home/${DOCKER_HOST_USER_NAME}/src"
       - "./assets/build:/home/${DOCKER_HOST_USER_NAME}/src/assets/build"
-      - "notUsed_build:/home/${DOCKER_HOST_USER_NAME}/src/_build"
-      - "notUsed_docker:/home/${DOCKER_HOST_USER_NAME}/src/docker"
-      - "notUsed_assets:/home/${DOCKER_HOST_USER_NAME}/src/assets"
+      - "not_used_build:/home/${DOCKER_HOST_USER_NAME}/src/_build"
+      - "not_used_docker:/home/${DOCKER_HOST_USER_NAME}/src/docker"
+      - "not_used_assets:/home/${DOCKER_HOST_USER_NAME}/src/assets"
+      - "not_used_elixir_ls:/home/${DOCKER_HOST_USER_NAME}/src/.elixir_ls"
+
 volumes:
-  notUsed_build:
-  notUsed_docker:
-  notUsed_assets:
+  not_used_build:
+  not_used_docker:
+  not_used_assets:
+  not_used_elixir_ls:

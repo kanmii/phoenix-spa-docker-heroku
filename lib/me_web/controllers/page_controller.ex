@@ -8,4 +8,8 @@ defmodule MeWeb.PageController do
     |> put_resp_header("content-type", "text/html")
     |> render("index.html")
   end
+
+  def healthz(conn, _) do
+    text(conn, "ok")
+  end
 end

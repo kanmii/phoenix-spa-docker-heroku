@@ -54,7 +54,8 @@ defmodule Me.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:corsica, "~> 1.1.3", only: [:dev, :test]},
-      {:mix_test_watch, "~> 1.0.2", only: :test, runtime: false}
+      {:mix_test_watch, "~> 1.0.2", only: :test, runtime: false},
+      {:cortex, "~> 0.6.0", only: [:dev, :test]}
     ]
   end
 

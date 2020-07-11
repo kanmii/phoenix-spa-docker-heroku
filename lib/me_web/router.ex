@@ -16,6 +16,8 @@ defmodule MeWeb.Router do
 
   scope "/", MeWeb do
     pipe_through :browser
+
+    get "/healthz", PageController, :healthz
     get "/*path", PageController, :index
   end
 end

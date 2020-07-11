@@ -2,7 +2,7 @@ FROM hexpm/elixir:1.9.4-erlang-22.3.4.2-debian-buster-20200511 AS dev
 
 ARG DOCKER_HOST_USER_NAME
 
-ENV APP_DEPS="openssl" \
+ENV APP_DEPS="openssl inotify-tools curl" \
   HOME_VAR=/home/${DOCKER_HOST_USER_NAME}
 
 RUN apt-get update \
@@ -11,17 +11,20 @@ RUN apt-get update \
   && useradd -m -g ${DOCKER_HOST_USER_NAME} ${DOCKER_HOST_USER_NAME} \
   && mkdir -p ${HOME_VAR}/src/assets
 
-COPY ./docker/entrypoint.sh /usr/local/bin
+COPY ./entrypoint.sh /usr/local/bin
+
+ADD https://raw.githubusercontent.com/humpangle/wait-until/v0.1.1/wait-until /usr/local/bin/
 
 WORKDIR ${HOME_VAR}/src
 
+COPY ./config ./mix.exs ./mix.lock ./
 COPY . .
 
 RUN chown -R \
   ${DOCKER_HOST_USER_NAME}:${DOCKER_HOST_USER_NAME} \
   ${HOME_VAR} \
-  && rm -rf docker \
-  && chmod +x /usr/local/bin/entrypoint.sh
+  && chmod 755 /usr/local/bin/entrypoint.sh \
+  && chmod 755 /usr/local/bin/wait-until
 
 # run app as non root user to avoid volume mount problems
 USER ${DOCKER_HOST_USER_NAME}
@@ -88,9 +91,12 @@ RUN apt-get update \
   && mkdir -p /me-app/assets/build \
   && chown -R me:me /me-app
 
-COPY ./docker/entrypoint.sh /usr/local/bin
+COPY ./entrypoint.sh /usr/local/bin
 
-RUN chmod +x /usr/local/bin/entrypoint.sh
+ADD https://raw.githubusercontent.com/humpangle/wait-until/v0.1.1/wait-until /usr/local/bin/
+
+RUN chmod 755 /usr/local/bin/entrypoint.sh \
+    && chmod 755 /usr/local/bin/wait-until
 
 WORKDIR /me-app
 
